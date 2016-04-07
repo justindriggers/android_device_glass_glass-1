@@ -1,0 +1,24 @@
+# TODO(abliss): these were copied from tuna and may be too permissive.
+#for DSSCOMP
+/dev/dsscomp              0666   system     system
+/dev/tiler                0666   system     system
+/dev/ion                  0666   system     system
+
+#for SYSLINK
+# TODO(abliss): STOPSHIP tighten this up!
+/dev/rpmsg-omx0           0666   drmrpc    drmrpc
+/dev/rpmsg-omx1           0666   drmrpc    drmrpc
+/dev/rproc_user           0666   drmrpc    drmrpc
+
+#for Sensors
+/dev/mpu                  0660   system     system
+/dev/mpuirq               0660   system     system
+/dev/accelirq             0660   system     system
+/dev/compassirq           0660   system     system
+/dev/timerirq             0660   system     system
+
+#for PVR
+/dev/pvrsrvkm             0666   system     system
+
+# for USB webcam
+/dev/video0               0777   system     system

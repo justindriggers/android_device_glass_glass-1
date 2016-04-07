@@ -1,0 +1,10 @@
+wifi.interface=wlan0
+com.ti.omap_enhancement=true
+ro.bq.gpu_to_cpu_unsupported=1
+
+# ------------------------------------------------------------------------------
+# TODO(aristidis): Remove following log properties when done debugging b/17029161
+log.tag.gms.CheckinService=VERBOSE
+log.tag.gms.Compat=VERBOSE
+log.tag.gms.EventLogService=VERBOSE
+log.tag.gsf.CheckinService=VERBOSE

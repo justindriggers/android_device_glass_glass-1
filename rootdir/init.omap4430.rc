@@ -1,0 +1,535 @@
+import init.omap4430.usb.rc
+import init.omap4430.bt.rc
+import init.omap4430.buildspecific.rc
+
+on post-fs-data
+    mkdir /data/system 0755 system system
+
+    # we will remap this as /mnt/sdcard with the sdcard fuse tool
+    mkdir /data/media 0775 media_rw media_rw
+    chown media_rw media_rw /data/media
+
+    # setup the glass-specific caching directory
+    mkdir /data/private-cache 0770 private_cache_rw private_cache_rw
+    # chmod required to turn on setuid/gid bits
+    chmod 6770 /data/private-cache
+
+on init
+    mkdir /mnt/shell/emulated 0700 shell shell
+    mkdir /storage/emulated 0555 root root
+
+    export EXTERNAL_STORAGE /storage/emulated/legacy
+    export EMULATED_STORAGE_SOURCE /mnt/shell/emulated
+    export EMULATED_STORAGE_TARGET /storage/emulated
+
+    export TERM linux
+    export TERMINFO /etc/terminfo/
+
+    chmod 444 /proc/cmdline
+
+    # Support legacy paths
+    symlink /storage/emulated/legacy /sdcard
+    symlink /storage/emulated/legacy /mnt/sdcard
+    symlink /storage/emulated/legacy /storage/sdcard0
+    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
+
+    # Let the frameworks/base gaze service open the prox sensor raw file.
+    chmod 0666 /dev/si114x
+
+    # GPS
+    chown system system /dev/ttyO3
+    chmod 0660 /dev/ttyO3
+
+    # Invensense MPU driver
+    chown system system /dev/iio:device0
+    chown system system /sys/bus/iio/devices/trigger0/name
+    chown system system /sys/bus/iio/devices/iio:device0/accl_bias
+    chown system system /sys/bus/iio/devices/iio:device0/accl_enable
+    chown system system /sys/bus/iio/devices/iio:device0/accl_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/buffer/length
+    chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
+    chown system system /sys/bus/iio/devices/iio:device0/compass_enable
+    chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_firmware
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chown system system /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chown system system /sys/bus/iio/devices/iio:device0/firmware_loaded
+    chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
+    chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
+    chown system system /sys/bus/iio/devices/iio:device0/key
+    chown system system /sys/bus/iio/devices/iio:device0/power_state
+    chown system system /sys/bus/iio/devices/iio:device0/quaternion_on
+    chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chown system system /sys/bus/iio/devices/iio:device0/self_test
+    chown system system /sys/bus/iio/devices/iio:device0/tap_on
+    chown system system /sys/bus/iio/devices/iio:device0/temperature
+    chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
+    chown system system /sys/bus/iio/devices/iio:device0/event_glu
+    chown system system /sys/bus/iio/devices/iio:device0/glu_level
+    chown system system /sys/bus/iio/devices/iio:device0/glu_outlier
+    chown system system /sys/bus/iio/devices/iio:device0/glu_roll
+    chown system system /sys/bus/iio/devices/iio:device0/glu_trigger
+
+    chmod 664 /dev/iio:device0
+    chmod 664 /sys/bus/iio/devices/trigger0/name
+    chmod 664 /sys/bus/iio/devices/iio:device0/accl_bias
+    chmod 664 /sys/bus/iio/devices/iio:device0/accl_enable
+    chmod 664 /sys/bus/iio/devices/iio:device0/accl_matrix
+    chmod 664 /sys/bus/iio/devices/iio:device0/buffer/length
+    chmod 664 /sys/bus/iio/devices/iio:device0/buffer/enable
+    chmod 664 /sys/bus/iio/devices/iio:device0/compass_enable
+    chmod 664 /sys/bus/iio/devices/iio:device0/compass_matrix
+    chmod 664 /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chmod 664 /sys/bus/iio/devices/iio:device0/dmp_firmware
+    chmod 664 /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chmod 664 /sys/bus/iio/devices/iio:device0/dmp_on
+    chmod 664 /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chmod 664 /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chmod 664 /sys/bus/iio/devices/iio:device0/firmware_loaded
+    chmod 664 /sys/bus/iio/devices/iio:device0/gyro_enable
+    chmod 664 /sys/bus/iio/devices/iio:device0/gyro_matrix
+    chmod 664 /sys/bus/iio/devices/iio:device0/in_accel_scale
+    chmod 664 /sys/bus/iio/devices/iio:device0/in_anglvel_scale
+    chmod 664 /sys/bus/iio/devices/iio:device0/in_magn_scale
+    chmod 664 /sys/bus/iio/devices/iio:device0/key
+    chmod 664 /sys/bus/iio/devices/iio:device0/power_state
+    chmod 664 /sys/bus/iio/devices/iio:device0/quaternion_on
+    chmod 664 /sys/bus/iio/devices/iio:device0/sampling_frequency
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chmod 664 /sys/bus/iio/devices/iio:device0/self_test
+    chmod 664 /sys/bus/iio/devices/iio:device0/tap_on
+    chmod 664 /sys/bus/iio/devices/iio:device0/temperature
+    chmod 664 /sys/bus/iio/devices/iio:device0/trigger/current_trigger
+    chmod 664 /sys/bus/iio/devices/iio:device0/event_glu
+    chmod 664 /sys/bus/iio/devices/iio:device0/glu_level
+    chmod 664 /sys/bus/iio/devices/iio:device0/glu_outliner
+    chmod 664 /sys/bus/iio/devices/iio:device0/glu_roll
+    chmod 664 /sys/bus/iio/devices/iio:device0/glu_trigger
+
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/lpa_mode
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/lpa_freq
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_outlier_max
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_outlier_min
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_gyro_bias_lpf_gain
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_relative_lookup_leak_gain
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_relative_angle_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_horizontal_threshold_squared
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_version4_on
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/orientation_on
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/display_orientation_on
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_time
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_min_count
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_z_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_z_offset
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_y_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_y_offset
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_x_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_x_offset
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_z_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_y_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_x_calibbias
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/als_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/ps_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/dump_regs
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/status
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/als_filter_interrupts
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/ps_filter_interrupts
+    chown media media /sys/devices/platform/usb_mux.0/mux_mode
+    chown system system /sys/devices/virtual/input/input2/als_adc
+    chown system system /sys/devices/virtual/input/input2/als_resolution
+    chown system system /sys/devices/virtual/input/input2/als_enable
+    chown system system /sys/devices/virtual/input/input2/als_gain
+    chown system system /sys/devices/virtual/input/input2/als_meas_rate
+    chown system system /sys/devices/virtual/input/input2/als_threshold
+    chown system system /sys/devices/virtual/input/input2/als_filter_interrupts
+    chown system system /sys/devices/virtual/input/input3/ps_adc
+    chown system system /sys/devices/virtual/input/input3/ps_enable
+    chown system system /sys/devices/virtual/input/input3/ps_gain
+    chown system system /sys/devices/virtual/input/input3/ps_led
+    chown system system /sys/devices/virtual/input/input3/ps_meas_rate
+    chown system system /sys/devices/virtual/input/input3/ps_pulse_cnt
+    chown system system /sys/devices/virtual/input/input3/ps_threshold
+    chown system system /sys/devices/virtual/input/input3/ps_filter_interrupts
+    chown system system /sys/devices/touchpad/touchpad.fn34/data
+    chown system system /sys/devices/touchpad/touchpad.fn34/status
+    chown system system /sys/devices/touchpad/touchpad.fn34/cmd
+    chown system system /sys/devices/touchpad/touchpad.fn34/bootloaderid
+    chown system system /sys/devices/touchpad/touchpad.fn34/blocknum
+    chown system system /sys/devices/touchpad/touchpad.fn34/rescanPDT
+    chown system system /sys/devices/touchpad/touchpad.fn01/sleepmode
+    chown system system /sys/devices/touchpad/touchpad.fn01/nosleep
+    chown system system /sys/devices/touchpad/touchpad.fn01/chargerinput
+    chown system system /sys/devices/touchpad/touchpad.fn01/reportrate
+    chown system system /sys/devices/touchpad/touchpad.fn01/reset
+    chown system system /sys/devices/touchpad/touchpad.fn11/relreport
+    chown system system /sys/devices/touchpad/touchpad.fn11/rezero
+    chown system system /sys/devices/touchpad/touchpad.fn11/abs_pos_filt
+    chown system system /sys/devices/touchpad/touchpad.fn05/no_auto_cal
+    chown system system /sys/devices/touchpad/enabled
+
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/lpa_mode
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/lpa_freq
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_outlier_max
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_outlier_min
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_gyro_bias_lpf_gain
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_relative_lookup_leak_gain
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_relative_angle_threshold
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_horizontal_threshold_squared
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/glu_version4_on
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/orientation_on
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/display_orientation_on
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_time
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_min_count
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/tap_threshold
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_z_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_z_offset
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_y_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_y_offset
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_x_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_accel_x_offset
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_z_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_y_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0068/iio:device0/in_anglvel_x_calibbias
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/als_enable
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/ps_enable
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/dump_regs
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/status
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/als_filter_interrupts
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-003a/ps_filter_interrupts
+    chmod 0664 /sys/devices/platform/usb_mux.0/mux_mode
+    chmod 0664 /sys/devices/virtual/input/input2/als_adc
+    chmod 0664 /sys/devices/virtual/input/input2/als_resolution
+    chmod 0664 /sys/devices/virtual/input/input2/als_enable
+    chmod 0664 /sys/devices/virtual/input/input2/als_gain
+    chmod 0664 /sys/devices/virtual/input/input2/als_meas_rate
+    chmod 0664 /sys/devices/virtual/input/input2/als_threshold
+    chmod 0664 /sys/devices/virtual/input/input2/als_filter_interrupts
+    chmod 0664 /sys/devices/virtual/input/input3/ps_adc
+    chmod 0664 /sys/devices/virtual/input/input3/ps_enable
+    chmod 0664 /sys/devices/virtual/input/input3/ps_gain
+    chmod 0664 /sys/devices/virtual/input/input3/ps_led
+    chmod 0664 /sys/devices/virtual/input/input3/ps_meas_rate
+    chmod 0664 /sys/devices/virtual/input/input3/ps_pulse_cnt
+    chmod 0664 /sys/devices/virtual/input/input3/ps_threshold
+    chmod 0664 /sys/devices/virtual/input/input3/ps_filter_interrupts
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/data
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/status
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/cmd
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/bootloaderid
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/blocknum
+    chmod 0664 /sys/devices/touchpad/touchpad.fn34/rescanPDT
+    chmod 0664 /sys/devices/touchpad/touchpad.fn01/sleepmode
+    chmod 0664 /sys/devices/touchpad/touchpad.fn01/nosleep
+    chmod 0664 /sys/devices/touchpad/touchpad.fn01/chargerinput
+    chmod 0664 /sys/devices/touchpad/touchpad.fn01/reportrate
+    chmod 0664 /sys/devices/touchpad/touchpad.fn01/reset
+    chmod 0664 /sys/devices/touchpad/touchpad.fn11/relreport
+    chmod 0664 /sys/devices/touchpad/touchpad.fn11/rezero
+    chmod 0664 /sys/devices/touchpad/touchpad.fn11/abs_pos_filt
+    chmod 0664 /sys/devices/touchpad/touchpad.fn05/no_auto_cal
+    chmod 0664 /sys/devices/touchpad/enabled
+
+on boot
+    mount debugfs /sys/kernel/debug /sys/kernel/debug
+    # change permission for ION driver
+    chmod 0777 /dev/ion
+    chmod 0666 /dev/pvrsrvkm
+    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/data/local/bin:/data/local/mnt/android/bin
+
+# cpufreq interactive governor: timer 20ms, min sample 20ms, hispeed 800MHz
+#   write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 20000
+#   write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 20000
+#   write /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq 800000
+
+# Boost the CPU for 30 secs during boot
+    write /sys/devices/system/cpu/cpufreq/interactive/boost_timeout 30000000
+    write /sys/devices/system/cpu/cpu0/cpufreq/boost_cpufreq 1
+
+    mkdir /data/misc/audio 0664 system system
+    mkdir /data/misc/gcam 0770 media camera 
+    mkdir /data/gps 0770 system system
+    mkdir /data/gps/nvm 0770 system system
+
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
+    chown dhcp dhcp /data/misc/dhcp
+
+    # Bluetooth
+    setprop ro.bt.bdaddr_path "/data/misc/bluedroid/bdaddr"
+    chown bluetooth bluetooth ro.bt.bdaddr_path
+    chown bluetooth bluetooth /dev/ttyO1
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chmod 0660                /sys/class/rfkill/rfkill0/state
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill3/type
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill3/state
+    chmod 0660                /sys/class/rfkill/rfkill3/state
+
+    chown wifi wifi           /sys/class/rfkill/rfkill1/type
+    chown wifi wifi           /sys/class/rfkill/rfkill1/state
+    chmod 0660                /sys/class/rfkill/rfkill1/state
+    chown wifi wifi           /sys/class/rfkill/rfkill2/type
+    chown wifi wifi           /sys/class/rfkill/rfkill2/state
+    chmod 0660                /sys/class/rfkill/rfkill2/state
+
+    setprop wlan.driver.vendor bcm
+    # Power management
+    chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+    # Limit propagation of 300Hz Vsync signals
+    write /sys/devices/platform/omapdss/manager2/vsync_divider 6
+
+    # Turn on the backlight early, albeit dim, to give earlier signs of life.
+    write /sys/devices/platform/omapdss/manager2/panel-notle-dpi/brightness 100
+
+    # Enable touchpad driver to intepret tap gestures
+    write /sys/bus/rmi/devices/touchpad.fn11/gesture 1
+
+    # Enable touchpad viewfinder area
+    write /sys/bus/rmi/devices/touchpad.fn11/view_enable 1
+
+    # This location needs to be writable for valgrind to work
+    mkdir -p /data/local/tmp
+    chmod 777 /data/local/tmp
+
+    # glasshub
+    chown system system /dev/glasshub
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/activity_guardband
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/activity_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/activity_timeout
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/ambient_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/bootloader_version
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/calibrate
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/calibration_values
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/current_timestamp
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/debug
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/detector_gain
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/disable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/doff_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/don_doff
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/don_doff_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/don_max_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/don_threshold
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/driver_version
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/driver_flags
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/error_code
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/flash_status
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/error_count
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/ir
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/irq
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/irq_status
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/irq_timestamp
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/last_irq_status
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/last_timestamp
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/led_drive
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/mcu_debug
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/mcu_debug16
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/passthru_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/pause
+    chown media media /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/pause_for_audio
+    chmod 0664 /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/pause_for_audio
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/prox_version
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/proxraw
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/sample_count
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/timer_count
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/update_fw_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/update_fw_data
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/version
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/visible
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/wink
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/wink_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/wink_flag_enable
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/wink_max
+    chown system system /sys/devices/platform/omap_i2c.4/i2c-4/4-0035/wink_min
+
+    chown system system /sys/kernel/debug/rmi/touchpad/irq_debug
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/rezero_wait
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/type_a.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/swap.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/offset.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/delta_threshold.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/clip.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F11/flip.0
+    chown system system /sys/kernel/debug/rmi/touchpad/F01/interrupt_enable
+    chown system system /sys/kernel/debug/rmi/touchpad/comms_debug
+
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/irq_debug
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/rezero_wait
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/type_a.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/swap.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/offset.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/delta_threshold.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/clip.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F11/flip.0
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/F01/interrupt_enable
+    chmod 0664 /sys/kernel/debug/rmi/touchpad/comms_debug
+
+    symlink /proc/self/fd /dev/fd
+
+on fs
+    symlink /dev/block/platform /dev/block/platform/omap
+    mount_all /fstab.omap4430
+    swapon_all /fstab.omap4430
+
+    # Set permissions for backlight control
+    chown system system /sys/devices/platform/omapdss/manager2/panel-notle-dpi/brightness
+    chown system system /sys/devices/platform/omapdss/manager2/panel-notle-dpi/brightness_limit
+    chown system system /sys/devices/platform/omapdss/manager2/panel-notle-dpi/brightness_multiplier
+    chown system system /sys/devices/platform/omapdss/manager2/panel-notle-dpi/mono
+    chown system system /sys/devices/platform/omapdss/manager2/panel-notle-dpi/gamma_preset
+
+    # Set permissions to allow display rendering rate control during video recording
+    chown media media /sys/devices/platform/omapdss/manager2/vsync_divider
+
+    # Wait for RPMSG to properly come up before bringing up the SGX module
+    wait /dev/rpmsg-omx0
+    wait /dev/rpmsg-omx1
+
+    # Bootconfig permissions
+    chown root system /dev/block/mmcblk0p4
+    chmod 0660 /dev/block/mmcblk0p4
+
+    # Load Required Kernel Modules
+    # Note for those who adb sync, you will make the ko -rw thus skipping
+    # the insmod below due to security reasons.
+    insmod /system/lib/modules/pvrsrvkm_sgx540_120.ko
+
+# H264 Encoder Profile setting
+# 1 - Base Profile
+# 2 - Main Profile
+# 8 - High Profile
+    setprop video.h264enc.profile 1
+
+on charger
+    write /sys/devices/platform/omapdss/manager2/panel-notle-dpi/brightness 255
+
+service battery-charger /charger
+    class charger
+
+service glass_gpsclear /system/bin/glass_gpsclear.sh
+    class main
+    user root
+    group root
+    oneshot
+
+service glass_bqflash /system/bin/glass_bqflash.sh
+    class main
+    user root
+    group root
+    oneshot
+
+service glass_tpflash /system/bin/glass_tpflash.sh
+    class main
+    user root
+    group root
+    oneshot
+
+service pvrsrvinit /vendor/bin/pvrsrvinit
+    class core
+    user root
+    group root
+    oneshot
+
+service sysproxyd /system/bin/sysproxyd
+    class main
+    user root
+    group root
+
+# create virtual SD card at /mnt/sdcard, based on the /data/media directory
+# daemon will drop to user/group system/media_rw after initializing
+# underlying files in /data/media will be created with user and group media_rw (1023)
+service sdcard /system/bin/sdcard /data/media /mnt/shell/emulated 1023 1023
+    class main
+
+service wpa_supplicant /system/bin/wpa_supplicant \
+    -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf \
+    -g@android:wpa_wlan0 \
+    -O/data/misc/wifi/sockets
+#   we will start as root and wpa_supplicant will switch to user wifi
+#   after setting up the capabilities required for WEXT
+#   user wifi
+#   group wifi inet keystore
+    class main
+    socket wpa_wlan0 dgram 660 wifi wifi
+    disabled
+    oneshot
+
+service dhcpcd_bt-pan /system/bin/dhcpcd -ABKL
+    class main
+    disabled
+    oneshot
+
+service iprenew_bt-pan /system/bin/dhcpcd -n
+    class main
+    disabled
+    oneshot
+
+service dhcpcd_wlan0 /system/bin/dhcpcd -ABKL
+    class main
+    disabled
+    oneshot
+
+service iprenew_wlan0 /system/bin/dhcpcd -n
+    class main
+    disabled
+    oneshot
+
+service setup_fs /system/bin/setup_fs \
+    /dev/block/platform/omap_hsmmc.1/by-name/cache \
+    /dev/block/platform/omap_hsmmc.1/by-name/userdata
+    class core
+    user root
+    group root
+    oneshot
+
+# Run a one time glass init script.
+service glass_init /system/bin/glass_init.sh
+    class main
+    oneshot
+
+# Read bootconfig data.
+service glass_bootconfig /system/bin/glass_bootconfig.sh
+    class main
+    oneshot
+
+# Texas Instruments Shared Memory Service
+service shm_service /system/bin/shm_service --no-fork
+    class core
+    user system
+    group system
+

@@ -1,0 +1,5 @@
+service glass_bdaddr /system/bin/glass_bdaddr.sh
+    class main
+    user bluetooth
+    group bluetooth net_bt_stack
+    oneshot

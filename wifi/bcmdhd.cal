@@ -1,0 +1,50 @@
+# Sample variables file for BCM94330 SD FC BG board
+#Firmware Rev. 90.125.62(B2)
+manfid=0x2d0
+prodid=0x054a
+vendid=0x14e4
+devid=0x4360
+boardtype=0x054a
+boardrev=0x10
+#boardflags:
+#            2.4GHz FEM: has ext 2.4GHz LNA, iPA only;
+#            2.4GHz FEM: SP3T switch share with BT;
+boardflags=0x1201
+nocrc=1
+xtalfreq=37400
+boardnum=22
+macaddr=00:90:4c:c5:12:38
+ag0=255
+aa2g=1
+ccode=ALL
+
+#for BT-coexistence
+btc_params80=0
+btc_params6=10
+btc_params8=10000
+
+#pa0b0=5166
+#pa0b1=64946
+#pa0b2=65394
+pa0b0=5311
+pa0b1=64923
+pa0b2=65383
+cckPwrOffset=5
+rssismf2g=0x6
+rssismc2g=0x3
+rssisav2g=0x7
+maxp2ga0=0x2c
+sromrev=3
+il0macaddr=00:90:4c:c5:12:38
+rfreg033=0x19
+rfreg033_cck=0x1f
+dacrate2g=160
+txalpfbyp2g=1
+bphyscale=17
+cckPwrIdxCorr=-15
+pacalidx2g=45
+txgaintbl=1
+wl0id=0x431b
+# muxenab: 0x1x HW OOB, 0x1 for UART enable, 0x2 for GPIOs, 0x8 for JTAG
+muxenab=0x10
+swctrlmap_2g=0x14241424,0x52621222,0x12221222,0x16222,0x1ff

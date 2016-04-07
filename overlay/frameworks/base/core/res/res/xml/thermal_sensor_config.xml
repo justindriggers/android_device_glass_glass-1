@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<thermalconfig>
+    <PlatformInfo>
+        <PlatformThermalStates>5</PlatformThermalStates>
+    </PlatformInfo>
+    <Zone>
+        <ZoneID>0</ZoneID>
+        <ZoneName>CPU</ZoneName>
+        <SupportsUEvent>0</SupportsUEvent>
+        <SensorLogic>0</SensorLogic>
+        <DebounceInterval>2000</DebounceInterval>
+        <PollDelay>
+            <DelayTOff>30000</DelayTOff>
+            <DelayNormal>30000</DelayNormal>
+            <DelayWarning>30000</DelayWarning>
+            <DelayAlert>30000</DelayAlert>
+            <DelayCritical>30000</DelayCritical>
+        </PollDelay>
+        <Sensor>
+            <SensorID>1</SensorID>
+            <SensorName>DTS</SensorName>
+            <SensorPath>/sys/devices/platform/coretemp.0/</SensorPath>
+            <InputTemp>temp2_input</InputTemp>
+            <HighTemp>temp2_threshold2</HighTemp>
+            <LowTemp>temp2_threshold1</LowTemp>
+            <UEventDevPath>none</UEventDevPath>
+            <Threshold>
+                <ThresholdTOff>0</ThresholdTOff>
+                <ThresholdNormal>90000</ThresholdNormal>
+                <ThresholdWarning>90000</ThresholdWarning>
+                <ThresholdAlert>90000</ThresholdAlert>
+                <ThresholdCritical>95000</ThresholdCritical>
+            </Threshold>
+        </Sensor>
+    </Zone>
+</thermalconfig>
