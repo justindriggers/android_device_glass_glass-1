@@ -28,4 +28,3 @@ PRODUCT_MANUFACTURER := Google
 PRODUCT_RESTRICT_VENDOR_FILES := false
 
 $(call inherit-product, device/glass/glass-1/device.mk)
-$(call inherit-product-if-exists, vendor/glass/glass-1/device-vendor.mk)

@@ -1,6 +1,5 @@
-import init.omap4430.usb.rc
-import init.omap4430.bt.rc
-import init.omap4430.buildspecific.rc
+import init.omap4.rc
+import init.glass_1.usb.rc
 
 on post-fs-data
     mkdir /data/system 0755 system system
@@ -441,35 +440,6 @@ on charger
 service battery-charger /charger
     class charger
 
-service glass_gpsclear /system/bin/glass_gpsclear.sh
-    class main
-    user root
-    group root
-    oneshot
-
-service glass_bqflash /system/bin/glass_bqflash.sh
-    class main
-    user root
-    group root
-    oneshot
-
-service glass_tpflash /system/bin/glass_tpflash.sh
-    class main
-    user root
-    group root
-    oneshot
-
-service pvrsrvinit /vendor/bin/pvrsrvinit
-    class core
-    user root
-    group root
-    oneshot
-
-service sysproxyd /system/bin/sysproxyd
-    class main
-    user root
-    group root
-
 # create virtual SD card at /mnt/sdcard, based on the /data/media directory
 # daemon will drop to user/group system/media_rw after initializing
 # underlying files in /data/media will be created with user and group media_rw (1023)
@@ -517,19 +487,9 @@ service setup_fs /system/bin/setup_fs \
     group root
     oneshot
 
-# Run a one time glass init script.
-service glass_init /system/bin/glass_init.sh
-    class main
-    oneshot
-
-# Read bootconfig data.
-service glass_bootconfig /system/bin/glass_bootconfig.sh
-    class main
-    oneshot
-
 # Texas Instruments Shared Memory Service
-service shm_service /system/bin/shm_service --no-fork
-    class core
-    user system
-    group system
+#service shm_service /system/bin/shm_service --no-fork
+#    class core
+#    user system
+#    group system
 

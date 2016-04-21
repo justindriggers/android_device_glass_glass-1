@@ -16,7 +16,3 @@
 $(call inherit-product, device/glass/glass-1/full_glass_1.mk)
 
 PRODUCT_NAME := aosp_glass_1
-
-PRODUCT_PACKAGES += \
-    Launcher3
-

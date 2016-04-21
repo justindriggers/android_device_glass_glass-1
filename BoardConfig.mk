@@ -14,59 +14,32 @@
 # limitations under the License.
 #
 
-TARGET_CPU_ABI := armeabi-v7a
-TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_SMP := true
-TARGET_ARCH := arm
-TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_CPU_VARIANT := cortex-a9
+# Inherit common omap4 board config
+-include hardware/ti/omap4/BoardConfigCommon.mk
+TI_OMAP_USE_BLTSVILLE := true
 
 TARGET_NO_BOOTLOADER := true
 
-BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_PAGESIZE := 2048
+TARGET_BOOTLOADER_BOARD_NAME := glass_1
 
+# Inline kernel building
+TARGET_KERNEL_SOURCE := kernel/glass/glass-1
+TARGET_KERNEL_CONFIG := notle_defconfig
+BOARD_KERNEL_PAGESIZE := 2048
+BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_CMDLINE := console=ttyO2,115200n8 vmalloc=500M androidboot.console=ttyO2 androidboot.carrier=wifi-only product_type=w cpuidle_sysfs_switch androidboot.selinux=permissive
 
-# Shader cache config options
-# Maximum size of the  GLES Shaders that can be cached for reuse.
-# Increase the size if shaders of size greater than 12KB are used.
-#MAX_EGL_CACHE_KEY_SIZE := 12*1024
+# External SGX Module
+SGX_MODULES:
+	make clean -C $(HARDWARE_TI_OMAP4_BASE)/pvr-source/eurasiacon/build/linux2/omap4430_android
+	cp $(TARGET_KERNEL_SOURCE)/drivers/video/omap2/omapfb/omapfb.h $(KERNEL_OUT)/drivers/video/omap2/omapfb/omapfb.h
+	make -j8 -C $(HARDWARE_TI_OMAP4_BASE)/pvr-source/eurasiacon/build/linux2/omap4430_android ARCH=arm KERNEL_CROSS_COMPILE=arm-eabi- CROSS_COMPILE=arm-eabi- KERNELDIR=$(KERNEL_OUT) TARGET_PRODUCT="blaze_tablet" BUILD=release TARGET_SGX=540 PLATFORM_VERSION=4.0
+	mv $(KERNEL_OUT)/../../target/kbuild/pvrsrvkm_sgx540_120.ko $(KERNEL_MODULES_OUT)
+	$(ARM_EABI_TOOLCHAIN)/arm-eabi-strip --strip-unneeded $(KERNEL_MODULES_OUT)/pvrsrvkm_sgx540_120.ko
 
-# Maximum GLES shader cache size for each app to store the compiled shader
-# binaries. Decrease the size if RAM or Flash Storage size is a limitation
-# of the device.
-#MAX_EGL_CACHE_SIZE := 2048*1024
+TARGET_KERNEL_MODULES += SGX_MODULES
 
-BOARD_USES_ALSA_AUDIO := true
-
-BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_BCM := true
-BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/glass/glass-1/bluetooth
-
-# Wifi related defines
-WPA_SUPPLICANT_VERSION      := VER_0_8_X
-BOARD_WLAN_DEVICE           := bcmdhd
-BOARD_WPA_SUPPLICANT_DRIVER := NL80211
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
-BOARD_HOSTAPD_DRIVER        := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB   := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
-WIFI_DRIVER_FW_PATH_PARAM   := "/sys/module/bcmdhd/parameters/firmware_path"
-WIFI_DRIVER_FW_PATH_STA     := "/vendor/firmware/fw_bcmdhd.bin"
-
-BOARD_USES_SECURE_SERVICES := true
-
-TARGET_NO_RADIOIMAGE := true
-TARGET_BOARD_PLATFORM := omap4
-TARGET_BOARD_PLATFORM_VARIANT := omap4-aah
-TARGET_BOOTLOADER_BOARD_NAME := glass_1
-TARGET_BOARD_INFO_FILE := device/glass/glass-1/board-info.txt
-
-BOARD_EGL_CFG := device/glass/glass-1/egl.cfg
-
-USE_OPENGL_RENDERER := true
-TARGET_USES_ION := true
-
+# Filesystem
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 8388608
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 8388608
@@ -74,14 +47,21 @@ BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1073741824
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 14028374016
 BOARD_FLASH_BLOCK_SIZE := 131072
 
-BOARD_CHARGER_DISABLE_INIT_BLANK := true
-BOARD_CHARGER_ENABLE_SUSPEND := true
+# Enable dex pre-optimization with PIC
+WITH_DEXPREOPT := true
+WITH_DEXPREOPT_PIC := true
 
-HAVE_ADRENO_SOURCE:= false
+# Wi-Fi
+BOARD_WLAN_DEVICE                := bcmdhd
+WPA_SUPPLICANT_VERSION           := VER_0_8_X
+BOARD_WPA_SUPPLICANT_DRIVER      := NL80211
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
+BOARD_HOSTAPD_DRIVER             := NL80211
+BOARD_HOSTAPD_PRIVATE_LIB        := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
+WIFI_DRIVER_FW_PATH_PARAM        := "/sys/module/bcmdhd/parameters/firmware_path"
+WIFI_DRIVER_FW_PATH_STA          := "/vendor/firmware/fw_bcmdhd.bin"
 
-OVERRIDE_RS_DRIVER:= libRSDriver_adreno.so
-TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
-
-#TARGET_TOUCHBOOST_FREQUENCY:= 1200
-
--include vendor/glass/glass-1/BoardConfigVendor.mk
+# Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_HAVE_BLUETOOTH_BCM := true
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/glass/glass-1/bluetooth
