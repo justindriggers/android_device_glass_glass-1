@@ -27,7 +27,7 @@ TARGET_KERNEL_SOURCE := kernel/glass/glass-1
 TARGET_KERNEL_CONFIG := notle_defconfig
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_CMDLINE := console=ttyO2,115200n8 vmalloc=500M androidboot.console=ttyO2 androidboot.carrier=wifi-only product_type=w cpuidle_sysfs_switch androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := console=ttyO2,115200n8 vmalloc=500M androidboot.hardware=omap4430 androidboot.console=ttyO2 androidboot.carrier=wifi-only product_type=w cpuidle_sysfs_switch androidboot.selinux=permissive
 
 # External SGX Module
 SGX_MODULES:
