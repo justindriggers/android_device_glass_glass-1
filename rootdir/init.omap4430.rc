@@ -1,5 +1,5 @@
 import init.omap4.rc
-import init.glass_1.usb.rc
+import init.omap4430.usb.rc
 
 on post-fs-data
     mkdir /data/system 0755 system system
@@ -427,9 +427,9 @@ service battery-charger /charger
     class charger
 
 service wpa_supplicant /system/bin/wpa_supplicant \
-    -Dnl80211 -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf \
-    -g@android:wpa_wlan0 \
-    -O/data/misc/wifi/sockets
+    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+    -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
 #   we will start as root and wpa_supplicant will switch to user wifi
 #   after setting up the capabilities required for WEXT
 #   user wifi

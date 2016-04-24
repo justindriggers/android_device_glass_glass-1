@@ -21,6 +21,11 @@ TARGET_BOARD_OMAP_CPU := 4430
 # Include common omap4 makefile
 $(call inherit-product, hardware/ti/omap4/omap4.mk)
 
+WIFI_BAND := 802_11_BG
+
+# Include bcm4330 makefile
+$(call inherit-product, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
+
 # Init files
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/init.omap4430.rc:root/init.omap4430.rc \
@@ -40,8 +45,7 @@ PRODUCT_COPY_FILES += \
     device/glass/glass-1/media_profiles.xml:system/etc/media_profiles.xml
 
 PRODUCT_COPY_FILES += \
-    device/glass/glass-1/wifi/bcmdhd.cal:system/etc/wifi/bcmdhd.cal \
-    device/glass/glass-1/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
+    device/glass/glass-1/wifi/bcmdhd.cal:system/etc/wifi/bcmdhd.cal
 
 # Hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -53,7 +57,6 @@ DEVICE_PACKAGE_OVERLAYS := \
 # Wi-Fi
 PRODUCT_PACKAGES += \
     libwpa_client \
-    hostapd \
     dhcpd.conf \
     wpa_supplicant \
     wpa_supplicant.conf
@@ -70,21 +73,5 @@ PRODUCT_PACKAGES += \
     make_ext4fs \
     setup_fs
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.carrier=wifi-only
-    wifi.interface=wlan0 \
-    wifi.supplicant_scan_interval=60
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    bluetooth.enable_timeout_ms=10000
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.sys.forced_orientation=0
-
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.opengles.version=131072 \
-    ro.sf.lcd_density=240
-
 $(call inherit-product-if-exists, vendor/glass/glass-1/device-vendor.mk)
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
-$(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
