@@ -18,12 +18,16 @@
 /*#define LOG_NDEBUG 0*/
 
 #include <errno.h>
+#include <stdlib.h>
 
 #include <hardware/audio.h>
 #include <hardware/hardware.h>
+#include <tinyalsa/asoundlib.h>
 
 struct notle_audio_device {
     struct audio_hw_device hw_device;
+
+    struct mixer *mixer;
 };
 
 static int adev_init_check(const struct audio_hw_device *dev __unused)
@@ -70,7 +74,7 @@ static int adev_set_parameters(struct audio_hw_device *dev __unused,
 static char * adev_get_parameters(const struct audio_hw_device *dev __unused,
                                   const char *keys __unused)
 {
-    return -ENOSYS;
+    return -ENOSYS; // TODO char *
 }
 
 static size_t adev_get_input_buffer_size(const struct audio_hw_device *dev __unused,
@@ -91,9 +95,9 @@ static int adev_open_output_stream(struct audio_hw_device *dev __unused,
 }
 
 static void adev_close_output_stream(struct audio_hw_device *dev __unused,
-                                     struct audio_stream_in *stream_in __unused)
+                                     struct audio_stream_out *stream_out __unused)
 {
-    return -ENOSYS;
+    // do nothing
 }
 
 static int adev_open_input_stream(struct audio_hw_device *dev __unused,
@@ -111,7 +115,7 @@ static int adev_open_input_stream(struct audio_hw_device *dev __unused,
 static void adev_close_input_stream(struct audio_hw_device *dev __unused,
                                     struct audio_stream_in *stream_in __unused)
 {
-    return -ENOSYS;
+    // do nothing
 }
 
 static int adev_dump(const struct audio_hw_device *dev __unused,
