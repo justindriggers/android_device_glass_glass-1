@@ -17,6 +17,9 @@
 #define LOG_TAG "audio_hw_primary"
 /*#define LOG_NDEBUG 0*/
 
+#include <hardware/audio.h>
+#include <hardware/hardware.h>
+
 static int adev_open(const hw_module_t* module, const char* name,
                      hw_device_t** device)
 {
