@@ -38,7 +38,7 @@ PRODUCT_COPY_FILES += \
 
 # Audio
 PRODUCT_COPY_FILES += \
-    device/glass/glass-1/audio_policy.conf:system/etc/audio_policy.conf
+    device/glass/glass-1/audio/audio_policy.conf:system/etc/audio_policy.conf
 
 PRODUCT_COPY_FILES += \
     device/glass/glass-1/media_codecs.xml:system/etc/media_codecs.xml \
@@ -61,8 +61,9 @@ PRODUCT_PACKAGES += \
     wpa_supplicant \
     wpa_supplicant.conf
 
-#Packages
+# Packages
 PRODUCT_PACKAGES += \
+    audio.primary.glass_1 \
     camera.omap4 \
     lights.omap4 \
     power.omap4
