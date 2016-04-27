@@ -20,6 +20,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#include <cutils/log.h>
+
 #include <hardware/audio.h>
 #include <hardware/hardware.h>
 #include <tinyalsa/asoundlib.h>
