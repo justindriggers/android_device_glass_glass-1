@@ -18,6 +18,8 @@
 /*#define LOG_NDEBUG 0*/
 
 #include <errno.h>
+#include <fcntl.h>
+#include <pthread.h>
 #include <stdlib.h>
 
 #include <cutils/log.h>
@@ -75,6 +77,43 @@
 #define MIXER_MUX_UL10                      "MUX_UL10"
 #define MIXER_MUX_UL11                      "MUX_UL11"
 
+/* Glass-specific sysfs paths */
+#define SYS_CONTROL_HEADSET                 "/sys/devices/platform/usb_mux.0/headset"
+#define SYS_CONTROL_MUX_MODE                "/sys/devices/platform/usb_mux.0/mux_mode"
+#define SYS_CONTROL_ID_MONITOR              "/sys/devices/platform/usb_mux.0/id_monitor"
+
+struct pcm_config pcm_config_mm = {
+    .chanels = 2,
+    .rate = DEFAULT_OUT_SAMPLING_RATE,
+    .period_size = LONG_PERIOD_SIZE,
+    .period_count = PLAYBACK_PERIOD_COUNT,
+    .format = PCM_FORMAT_S16_LE,
+}
+
+struct pcm_config pcm_config_wb_vx = {
+    .chanels = 0,
+    .rate = DEFAULT_OUT_SAMPLING_RATE,
+    .period_size = LONG_PERIOD_SIZE,
+    .period_count = PLAYBACK_PERIOD_COUNT,
+    .format = PCM_FORMAT_S16_LE,
+}
+
+struct pcm_config pcm_config_nb_vx = {
+    .chanels = 0,
+    .rate = DEFAULT_OUT_SAMPLING_RATE,
+    .period_size = LONG_PERIOD_SIZE,
+    .period_count = PLAYBACK_PERIOD_COUNT,
+    .format = PCM_FORMAT_S16_LE,
+}
+
+struct pcm_config pcm_config_mm_vx = {
+    .chanels = 0,
+    .rate = DEFAULT_OUT_SAMPLING_RATE,
+    .period_size = LONG_PERIOD_SIZE,
+    .period_count = PLAYBACK_PERIOD_COUNT,
+    .format = PCM_FORMAT_S16_LE,
+}
+
 struct mixer_ctls
 {
     struct mixer_ctl *mm_dl1;
@@ -92,9 +131,45 @@ struct mixer_ctls
 struct notle_audio_device {
     struct audio_hw_device hw_device;
 
+    pthread_mutex_t lock;
     struct mixer *mixer;
     struct mixer_ctls mixer_ctls;
 };
+
+/* The enable flag when 0 makes the assumption that enums are disabled by
+ * "Off" and integers/booleans by 0 */
+static int set_route_by_array(struct mixer *mixer, struct route_setting *route,
+                              int enable)
+{
+    struct mixer_ctl *ctl;
+    unsigned int i, j;
+
+    /* Go through the route array and set each value */
+    i = 0;
+    while (route[i].ctl_name) {
+        ctl = mixer_get_ctl_by_name(mixer, route[i].ctl_name);
+        if (!ctl)
+            return -EINVAL;
+
+        if (route[i].strval) {
+            if (enable)
+                mixer_ctl_set_enum_by_string(ctl, route[i].strval);
+            else
+                mixer_ctl_set_enum_by_string(ctl, "Off");
+        } else {
+            /* This ensures multiple (i.e. stereo) values are set jointly */
+            for (j = 0; j < mixer_ctl_get_num_values(ctl); j++) {
+                if (enable)
+                    mixer_ctl_set_value(ctl, j, route[i].intval);
+                else
+                    mixer_ctl_set_value(ctl, j, 0);
+            }
+        }
+        i++;
+    }
+
+    return 0;
+}
 
 static int adev_init_check(const struct audio_hw_device *dev __unused)
 {
@@ -273,6 +348,33 @@ static int adev_open(const hw_module_t* module, const char* name,
         ALOGE("Unable to locate all mixer controls, aborting.");
         return -EINVAL;
     }
+
+    /* Set the default route before the PCM stream is opened */
+    pthread_mutex_lock(&adev->lock);
+    // TODO set_route_by_array(adev->mixer, defaults, 1);
+
+    int headset_fd = open(SYS_CONTROL_HEADSET, O_RDONLY);
+    if (headset_fd < 0) {
+        ALOGE("Cannot open %s to check for headset\\n", SYS_CONTROL_HEADSET);
+    } else {
+        ALOGE("Successfully opened %s to check for headset\\n", SYS_CONTROL_HEADSET);
+    }
+
+    int mux_mode_fd = open(SYS_CONTROL_MUX_MODE, O_WRONLY);
+    if (mux_mode_fd < 0) {
+        ALOGE("Cannot open %s to switch USB MUX\\n", SYS_CONTROL_MUX_MODE);
+    } else {
+        ALOGE("Successfully opened %s to switch USB MUX\\n", SYS_CONTROL_MUX_MODE);
+    }
+
+    int id_monitor_fd = open(SYS_CONTROL_ID_MONITOR, O_WRONLY);
+    if (id_monitor_fd < 0) {
+        ALOGE("Cannot open %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
+    } else {
+        ALOGE("Successfully opened %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
+    }
+
+    pthread_mutex_unlock(&adev->lock);
 
     *device = &adev->hw_device.common;
 
