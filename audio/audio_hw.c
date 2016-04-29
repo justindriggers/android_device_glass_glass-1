@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <cutils/log.h>
 
@@ -82,6 +83,12 @@
 #define SYS_CONTROL_MUX_MODE                "/sys/devices/platform/usb_mux.0/mux_mode"
 #define SYS_CONTROL_ID_MONITOR              "/sys/devices/platform/usb_mux.0/id_monitor"
 
+/* Headset status */
+#define HEADSET_NONE                        1
+#define HEADSET_MONO                        2
+#define HEADSET_STEREO                      3
+#define HEADSET_ERROR                       6
+
 struct pcm_config pcm_config_mm = {
     .chanels = 2,
     .rate = DEFAULT_OUT_SAMPLING_RATE,
@@ -136,10 +143,50 @@ struct notle_audio_device {
     struct mixer_ctls mixer_ctls;
 };
 
+struct route_setting
+{
+    char *ctl_name;
+    int intval;
+    char *strval;
+}
+
+/* These are values that never change */
+struct route_setting defaults[] = {
+    // TODO
+    {
+        .ctl_name = NULL,
+    },
+};
+
+static int select_hs_device(int fd)
+{
+    int ret;
+    char *buffer[size];
+
+    off_t size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+
+    ssize_t bytes_read = read(fd, &buffer, size);
+
+    if (bytes_read <= 0) {
+        ALOGE("%s: failed reading headset sysfs %d\\n", __FUNCTION__, fd);
+        ret = HEADSET_UNKNOWN;
+    } else {
+        if (strncmp(buffer, "Mono", 4) == 0) {
+            ret = HEADSET_MONO;
+        } else if (strncmp(buffer, "Stereo", 6) == 0) {
+            ret = HEADSET_STEREO;
+        } else {
+            ret = HEADSET_NONE;
+        }
+    }
+
+    return ret;
+}
+
 /* The enable flag when 0 makes the assumption that enums are disabled by
  * "Off" and integers/booleans by 0 */
-static int set_route_by_array(struct mixer *mixer, struct route_setting *route,
-                              int enable)
+static int set_route_by_array(struct mixer *mixer, struct route_setting *route)
 {
     struct mixer_ctl *ctl;
     unsigned int i, j;
@@ -152,17 +199,11 @@ static int set_route_by_array(struct mixer *mixer, struct route_setting *route,
             return -EINVAL;
 
         if (route[i].strval) {
-            if (enable)
-                mixer_ctl_set_enum_by_string(ctl, route[i].strval);
-            else
-                mixer_ctl_set_enum_by_string(ctl, "Off");
+            mixer_ctl_set_enum_by_string(ctl, route[i].strval);
         } else {
             /* This ensures multiple (i.e. stereo) values are set jointly */
             for (j = 0; j < mixer_ctl_get_num_values(ctl); j++) {
-                if (enable)
-                    mixer_ctl_set_value(ctl, j, route[i].intval);
-                else
-                    mixer_ctl_set_value(ctl, j, 0);
+                mixer_ctl_set_value(ctl, j, route[i].intval);
             }
         }
         i++;
@@ -351,28 +392,30 @@ static int adev_open(const hw_module_t* module, const char* name,
 
     /* Set the default route before the PCM stream is opened */
     pthread_mutex_lock(&adev->lock);
-    // TODO set_route_by_array(adev->mixer, defaults, 1);
+    set_route_by_array(adev->mixer, defaults);
 
     int headset_fd = open(SYS_CONTROL_HEADSET, O_RDONLY);
     if (headset_fd < 0) {
         ALOGE("Cannot open %s to check for headset\\n", SYS_CONTROL_HEADSET);
-    } else {
-        ALOGE("Successfully opened %s to check for headset\\n", SYS_CONTROL_HEADSET);
     }
+
+    ALOGE("Successfully opened %s to check for headset\\n", SYS_CONTROL_HEADSET);
 
     int mux_mode_fd = open(SYS_CONTROL_MUX_MODE, O_WRONLY);
     if (mux_mode_fd < 0) {
         ALOGE("Cannot open %s to switch USB MUX\\n", SYS_CONTROL_MUX_MODE);
-    } else {
-        ALOGE("Successfully opened %s to switch USB MUX\\n", SYS_CONTROL_MUX_MODE);
     }
+
+    ALOGE("Successfully opened %s to switch USB MUX\\n", SYS_CONTROL_MUX_MODE);
 
     int id_monitor_fd = open(SYS_CONTROL_ID_MONITOR, O_WRONLY);
     if (id_monitor_fd < 0) {
         ALOGE("Cannot open %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
-    } else {
-        ALOGE("Successfully opened %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
     }
+
+    ALOGE("Successfully opened %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
+
+    select_headset_device(headset_fd);
 
     pthread_mutex_unlock(&adev->lock);
 
