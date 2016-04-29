@@ -148,7 +148,7 @@ struct route_setting
     char *ctl_name;
     int intval;
     char *strval;
-}
+};
 
 /* These are values that never change */
 struct route_setting defaults[] = {
@@ -161,16 +161,18 @@ struct route_setting defaults[] = {
 static int select_hs_device(int fd)
 {
     int ret;
-    char *buffer[size];
 
     off_t size = lseek(fd, 0, SEEK_END);
+
+    char *buffer[size];
+
     lseek(fd, 0, SEEK_SET);
 
     ssize_t bytes_read = read(fd, &buffer, size);
 
     if (bytes_read <= 0) {
         ALOGE("%s: failed reading headset sysfs %d\\n", __FUNCTION__, fd);
-        ret = HEADSET_UNKNOWN;
+        ret = HEADSET_ERROR;
     } else {
         if (strncmp(buffer, "Mono", 4) == 0) {
             ret = HEADSET_MONO;
@@ -415,7 +417,7 @@ static int adev_open(const hw_module_t* module, const char* name,
 
     ALOGE("Successfully opened %s to monitor ID line\\n", SYS_CONTROL_ID_MONITOR);
 
-    select_headset_device(headset_fd);
+    select_hs_device(headset_fd);
 
     pthread_mutex_unlock(&adev->lock);
 
