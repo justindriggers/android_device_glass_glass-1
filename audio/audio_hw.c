@@ -95,7 +95,7 @@ struct pcm_config pcm_config_mm = {
     .period_size = LONG_PERIOD_SIZE,
     .period_count = PLAYBACK_PERIOD_COUNT,
     .format = PCM_FORMAT_S16_LE,
-}
+};
 
 struct pcm_config pcm_config_wb_vx = {
     .chanels = 0,
@@ -103,7 +103,7 @@ struct pcm_config pcm_config_wb_vx = {
     .period_size = LONG_PERIOD_SIZE,
     .period_count = PLAYBACK_PERIOD_COUNT,
     .format = PCM_FORMAT_S16_LE,
-}
+};
 
 struct pcm_config pcm_config_nb_vx = {
     .chanels = 0,
@@ -111,7 +111,7 @@ struct pcm_config pcm_config_nb_vx = {
     .period_size = LONG_PERIOD_SIZE,
     .period_count = PLAYBACK_PERIOD_COUNT,
     .format = PCM_FORMAT_S16_LE,
-}
+};
 
 struct pcm_config pcm_config_mm_vx = {
     .chanels = 0,
@@ -119,7 +119,7 @@ struct pcm_config pcm_config_mm_vx = {
     .period_size = LONG_PERIOD_SIZE,
     .period_count = PLAYBACK_PERIOD_COUNT,
     .format = PCM_FORMAT_S16_LE,
-}
+};
 
 struct mixer_ctls
 {
@@ -162,15 +162,12 @@ static int select_hs_device(int fd)
 {
     int ret;
 
-    off_t size = lseek(fd, 0, SEEK_END);
-
-    char *buffer[size];
-
+    int size = lseek(fd, 0, SEEK_END);
     lseek(fd, 0, SEEK_SET);
 
-    ssize_t bytes_read = read(fd, &buffer, size);
+    char buffer[size];
 
-    if (bytes_read <= 0) {
+    if (read(fd, buffer, size) <= 0) {
         ALOGE("%s: failed reading headset sysfs %d\\n", __FUNCTION__, fd);
         ret = HEADSET_ERROR;
     } else {
