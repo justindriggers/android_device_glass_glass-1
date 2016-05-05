@@ -27,7 +27,7 @@ TARGET_KERNEL_SOURCE := kernel/glass/glass-1
 TARGET_KERNEL_CONFIG := notle_defconfig
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_BASE := 0x80000000
-BOARD_KERNEL_CMDLINE := androidboot.hardware=omap4430 androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := androidboot.hardware=omap4430 vmalloc=500M androidboot.carrier=wifi-only product_type=w androidboot.selinux=permissive
 
 # External SGX Module
 SGX_MODULES:
